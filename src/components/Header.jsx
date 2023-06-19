@@ -1,29 +1,29 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import  styled  from 'styled-components'
 export default function Header() {
   return (
     <>
         <HeaderStyle> 
-                <Link to='/'>
+                <NavLink to='/'>
                     <h3>Believe_this?</h3>
-                </Link>
+                </NavLink>
             <HeaderListStyle>
                 <ul>
                     <li>
-                        <Link to="/">
+                        <NavLink to="/" className={({isActive}) => (isActive ? "active" : 'none')}>
                             홈
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to='/board'>
+                        <NavLink to='/board' className={({isActive}) => (isActive ? "active" : 'none')}>
                             뉴스
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to='/mypage'>
+                        <NavLink to='/mypage' className={({isActive}) => (isActive ? "active" : 'none')}>
                             마이페이지
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
                 </HeaderListStyle>
@@ -46,6 +46,7 @@ const HeaderStyle = styled.div`
     padding:0.7rem;
     
  }
+ 
 `
 
 const HeaderListStyle = styled.div`  
@@ -63,6 +64,14 @@ const HeaderListStyle = styled.div`
   }
   a{
     text-decoration: none;
+  }
+  a.active {
+    font-weight: 600; 
+    border-bottom: 2px solid #22b8cf; 
+    color: #22b8cf;
+    &:hover{
+      color: #3bc9db;
+    }
   }
 `
 

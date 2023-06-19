@@ -1,0 +1,361 @@
+import React from "react";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+export default function SignUp() {
+  // 최종 승인
+  const [notAllow, setNotAllow] = useState(true);
+  const navigate = useNavigate();
+  // 이메일 정규식
+  const regurl = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+  // 유저 정보값
+  const [user, setUser] = useState({
+    account: "",
+    password: "",
+    nickname: "",
+    name: "",
+    email: "",
+  });
+  // 유저 정보 확인
+  const [checkUser, setCheckUser] = useState({
+    confirmPassword: "",
+    idCheck: false,
+    passwordCheck: false,
+    nicknameCheck:false,
+    nameCheck:false,
+    emailCheck:false,
+    confirmPasswordCheck: false,
+    clickIdCheck: false,
+    clickPasswordCheck: false,
+    clickPasswordCheck2: false,
+  });
+
+  // 버튼 활성화 시키는 함수
+  useEffect(() => {
+    if (
+      checkUser.idCheck &&
+      checkUser.passwordCheck &&
+      checkUser.confirmPasswordCheck &&
+      checkUser.nicknameCheck &&
+      checkUser.nameCheck &&
+      checkUser.emailCheck
+    ) {
+      setNotAllow(false);
+      return;
+    }
+    setNotAllow(true);
+  }, [
+    checkUser.idCheck,
+    checkUser.passwordCheck,
+    checkUser.confirmPasswordCheck,
+    checkUser.nicknameCheck,
+    checkUser.nameCheck,
+    checkUser.emailCheck
+  ]);
+
+  // 이메일 정규식 확인 함수
+  const idConfirm = (e) => {
+    if (e.length >= 8) {
+      setCheckUser({
+        ...checkUser,
+        idCheck: true,
+      });
+    } else {
+      setCheckUser({
+        ...checkUser,
+        idCheck: false,
+      });
+    }
+  };
+
+  // 비밀번호 길이 확인
+  const passwordConfirm = (e) => {
+    if (e.length >= 8) {
+      setCheckUser({
+        ...checkUser,
+        passwordCheck: true,
+      });
+    } else {
+      setCheckUser({
+        ...checkUser,
+        passwordCheck: false,
+      });
+    }
+  };
+  // 비밀번호 재확인
+  const passwordConfirm2 = (e) => {
+    if (user.password === e) {
+      setCheckUser({
+        ...checkUser,
+        confirmPasswordCheck: true,
+      });
+    } else {
+      setCheckUser({
+        ...checkUser,
+        confirmPasswordCheck: false,
+      });
+    }
+  };
+
+  const emailConfirm = (e) => {
+    if (regurl.test(e)){
+        setCheckUser({
+            ...checkUser,
+            emailCheck: true,
+        });
+    } else {
+        setCheckUser({
+            ...checkUser,
+            emailCheck: true,
+        });
+    }
+  }
+  const nameConfirm = (e) => {
+    if (e.length >= 1){
+        setCheckUser({
+            ...checkUser,
+            nameCheck: true,
+        });
+    } else {
+        setCheckUser({
+            ...checkUser,
+            nameCheck: true,
+        });
+    }
+  }
+
+  const nicknameConfirm = (e) => {
+    if (e.length >= 1){
+        setCheckUser({
+            ...checkUser,
+            nicknameCheck: true,
+        });
+    } else {
+        setCheckUser({
+            ...checkUser,
+            nicknameCheck: true,
+        });
+    }
+  }
+  // 회원가입 서버에 넘기는 함수
+  const regSuccess = async () => {
+    console.log(user);
+    const loginCheck = await axios
+      .post(`${process.env.REACT_APP_BACK_URL}/register`, user)
+      .then((response) => {
+        console.log("성공 적인 회원가입", response);
+        alert("회원가입이 완료되었습니다.");
+        navigate("/signin");
+      })
+      .catch((err) => {
+        console.log("error!:", err);
+        alert("오류가 발생했습니다.");
+      });
+
+    return loginCheck;
+  };
+
+  return (
+    <LoginStyle>
+      <div className="login-form">
+        <h1>회원가입</h1>
+        <div>
+          <div className="input-line">
+            <span>아이디</span>
+            <div>
+              <input
+                type="text"
+                data-testid="email-input"
+                placeholder="아이디를 입력해주세요"
+                value={user.account}
+                onChange={(e) => {
+                  setUser({ ...user, account: e.target.value });
+                  idConfirm(e.target.value);
+                }}
+                onClick={() => {
+                  if (checkUser.clickEmailCheck === false) {
+                    setCheckUser({ ...checkUser, clickEmailCheck: true });
+                  }
+                }}
+              />
+              {checkUser.clickEmailCheck && !checkUser.idCheck && (
+                <div className="errorMessage">
+                  아이디를 제대로 입력해주세요.
+                </div>
+              )}
+            </div>
+            <span>비밀번호</span>
+            <div>
+              <input
+                type="password"
+                data-testid="password-input"
+                placeholder="비밀번호를 입력해주세요(8자리 이상)"
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    password: e.target.value,
+                  });
+                  passwordConfirm(e.target.value);
+                }}
+                onClick={() => {
+                  if (checkUser.clickPasswordCheck === false) {
+                    setCheckUser({ ...checkUser, clickPasswordCheck: true });
+                  }
+                }}
+              />
+              {checkUser.clickPasswordCheck && !checkUser.passwordCheck && (
+                <div className="errorMessage">8자리 이상 입력해주세요</div>
+              )}
+              <input
+                type="password"
+                className="input-check"
+                placeholder="비밀번호 확인"
+                onChange={(e) => {
+                  setCheckUser({
+                    ...checkUser,
+                    confirmPassword: e.target.value,
+                  });
+                  passwordConfirm2(e.target.value);
+                }}
+                onClick={() => {
+                  if (checkUser.clickPasswordCheck2 === false) {
+                    setCheckUser({ ...checkUser, clickPasswordCheck2: true });
+                  }
+                }}
+              />
+              {checkUser.clickPasswordCheck2 &&
+                !checkUser.confirmPasswordCheck && (
+                  <div className="errorMessage">
+                    비밀번호가 일치하지 않습니다.
+                  </div>
+                )}
+            </div>
+            <span>이메일</span>
+            <div>
+              <input
+                type="text"
+                placeholder="이메일을 입력해주세요"
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    email: e.target.value,
+                  });
+                  emailConfirm(e.target.value);
+                }}
+              />
+            </div>
+            <span>이름</span>
+            <div>
+              <input
+                type="text"
+                placeholder="이름을 입력해주세요"
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    name: e.target.value,
+                  });
+                  nameConfirm(e.target.value);
+                }}
+              />
+            </div>
+            <span>닉네임</span>
+            <div>
+              <input
+                type="text"
+                placeholder="사이트에서 사용할 이름을 입력해주세요"
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    nickname: e.target.value,
+                  });
+                  nicknameConfirm(e.target.value);
+                }}
+              />
+            </div>
+          </div>
+          <div className="login-form-button">
+            <input
+              type="button"
+              data-testid="signup-button"
+              disabled={notAllow}
+              value="회원가입"
+              onClick={regSuccess}
+            />
+          </div>
+        </div>
+      </div>
+    </LoginStyle>
+  );
+}
+
+const LoginStyle = styled.div`
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100%;
+  height: 100%;
+  max-height: 98vh;
+  max-width: 400px;
+  padding: 5px 20px;
+  background-color: #e1fff5;
+
+  h1 {
+    justify-content: start;
+    padding-top: 30px;
+  }
+  span {
+    font-size: 18px;
+    padding-right: 310px;
+  }
+  .login-form {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .input-line div {
+    padding: 10px;
+    input {
+      width: 380px;
+      height: 40px;
+      border-radius: 10px;
+    }
+  }
+
+  .login-form-button {
+    position: absolute;
+    bottom: 20px;
+    input {
+      width: 390px;
+      height: 40px;
+      border: 2px solid white;
+      border-radius: 10px;
+      background-color: #b0efff;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    input:disabled {
+      background-color: #dadada;
+      color: white;
+    }
+  }
+  .input-check {
+    margin-top: 5px;
+  }
+  .errorMessage {
+    color: red;
+    font-size: 10px;
+    padding: 0px;
+    text-align: start;
+  }
+  .successMessage {
+    color: lightgreen;
+    font-size: 10px;
+    padding: 0px;
+    text-align: start;
+  }
+`;
